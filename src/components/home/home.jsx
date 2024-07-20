@@ -1,3 +1,4 @@
+"use client";
 import Heading from "@/components/common/heading";
 import ProductCarousel from "../common/product-crousel";
 import CollectionCard from "@/components/home/collection-card";

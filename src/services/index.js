@@ -98,7 +98,12 @@ API.forgetPassword = (payload) => {
 API.subscribeByEmail = (payload) => {
   return API.post(`/SubscribeByEmail`, payload);
 };
-
+API.getReviews = (productId) => {
+  return API.get(`/GetRatingInfo/${productId}`);
+};
+API.createRating = (payload) => {
+  return API.post(`/CreateRating`, payload);
+};
 API.interceptors.request.use(
   function (config) {
     const token = Cookies.get("token");

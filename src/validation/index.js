@@ -71,3 +71,19 @@ export const trackOrderchema = z.object({
     message: "email required",
   }),
 });
+
+export const reviewFormSchema = z.object({
+  name: z.string().min(1, {
+    message: "Name is required",
+  }),
+  email: z.string().min(1, {
+    message: "Email is required",
+  }),
+
+  title: z.string().min(1, {
+    message: "Title is required",
+  }),
+  description: z.string().min(1, {
+    message: "Description is required",
+  }),
+});

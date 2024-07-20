@@ -14,6 +14,7 @@ import Heading from "../common/heading";
 import ProductCarousel from "../common/product-crousel";
 import { API } from "@/services";
 import { Skeleton } from "../ui/skeleton";
+import Review from "./review-form";
 
 function ProductDetail({ data }) {
   const router = useRouter();
@@ -30,6 +31,7 @@ function ProductDetail({ data }) {
   const [api2, setApi2] = useState(null);
   const [image, setImage] = useState([]);
   const [quantity, setQuantity] = useState(1);
+  const [reviews, setReviews] = useState([]);
 
   const increment = () => {
     setQuantity(quantity + 1);
@@ -87,13 +89,28 @@ function ProductDetail({ data }) {
     }
   };
 
+  const getReview = async (id) => {
+    try {
+      let res = await API.getReviews(id);
+      let data = res.data;
+      setReviews(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    if (data?.id) {
+      getReview(data?.id);
+    }
   }, []);
 
+  const [isReview, setReview] = useState(false);
+
   return (
-    <>
-      <main className="flex xl:flex-row flex-col bg-white gap-4 items-start justify-center pt-16 container overflow-hidden">
+    <main>
+      <div className="flex xl:flex-row flex-col bg-white gap-4 items-start justify-center pt-16 container overflow-hidden">
         <div className="w-full  gap-4 lg:flex hidden ">
           <div className="flex flex-col" style={{ height: "750px" }}>
             <Carousel
@@ -370,13 +387,100 @@ function ProductDetail({ data }) {
             </div>
           </div>
         </div>
-      </main>
+      </div>
+      <div className="container my-10 grid gap-5">
+        <div className="flex justify-end ">
+          <Button
+            name={"Write A Review"}
+            onClick={() => setReview(!isReview)}
+          />
+        </div>
+        {isReview && (
+          <div className="border border-slate-300  md:p-6 p-4 rounded-md">
+            <Review
+              setReview={setReview}
+              setReviews={setReviews}
+              reviews={reviews}
+              productId={data.id}
+            />
+          </div>
+        )}
+        <div>
+          <h2 className="text-sm text-slate-600 font-semibold mb-3">Reviews</h2>
+          <div className="flex flex-col gap-y-2">
+            {reviews.length == 0 ? (
+              <h2 className="text-base font-semibold text-gray-900">
+                No Reviews Available
+              </h2>
+            ) : (
+              reviews?.map((review, index) => {
+                return (
+                  <div
+                    key={index}
+                    className=" bg-slate-100/80 hover:bg-slate-100/50 rounded-lg p-4"
+                  >
+                    <div class="flex items-center gap-x-2 mb-1 ">
+                      <div className="text-gray-900 w-11 h-11 text-base text-center flex items-center justify-center rounded-full bg-slate-200/90 hover:bg-slate-200/70  ">
+                        {review?.name?.slice(0, 1)}
+                      </div>
+                      <div class="font-medium text-gray-900 ">
+                        <p>
+                          {review?.name}
+                          <time
+                            datetime="2014-08-16 19:00"
+                            class="block text-sm text-gray-500"
+                          >
+                            {new Date(" 9/17/2016").toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </time>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center  space-x-1 mb-1  ">
+                      {[...Array(5)].map((star, index) => {
+                        index += 1;
+                        return (
+                          <button
+                            type="button"
+                            key={index}
+                            className={`text-2xl ${
+                              index <= review?.rating
+                                ? "text-yellow-500"
+                                : "text-gray-300"
+                            }`}
+                          >
+                            &#9733;
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="mb-1 text-base text-gray-800 min-h-5">
+                      {review?.title}
+                    </p>
+                    <p class=" text-gray-500  text-sm min-h-5">
+                      {review?.title}
+                    </p>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className=" container my-20">
         <Heading title={"Recent Products"} addClass={"mb-10 font-semibold"} />
 
         {productLoading ? (
-          <div className="grid lg:grid-cols-5 md:grid-cols-2 grid-cols-1 gap-4 w-full  py-5">
-            {Array(5)
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-4 w-full  py-5">
+            {Array(4)
               .fill()
               .map((_, index) => (
                 <div key={index} className="flex flex-col space-y-2">
@@ -402,7 +506,7 @@ function ProductDetail({ data }) {
           />
         )}
       </div>
-    </>
+    </main>
   );
 }
 
